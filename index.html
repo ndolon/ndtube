@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NDtube - Download Video Lebih Mudah</title>
+  <meta name="description" content="Unduh video favoritmu, convert ke MP3, dan putar di background dengan cepat dan ringan menggunakan NDTube."/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
+          colors: { primary:'#FF6B35', secondary:'#00F5FF', dark:'#0A0A0F', darker:'#050507', glass:'rgba(255,255,255,0.08)', 'glass-border':'rgba(255,255,255,0.15)' },
+          animation: { float:'float 6s ease-in-out infinite', 'pulse-glow':'pulseGlow 2s ease-in-out infinite alternate', 'fade-in-up':'fadeInUp 0.6s ease-out forwards' },
+          keyframes: {
+            float: { '0%,100%':{transform:'translateY(0px)'}, '50%':{transform:'translateY(-20px)'} },
+            pulseGlow: { '0%':{boxShadow:'0 0 20px rgba(255,107,53,0.4)'}, '100%':{boxShadow:'0 0 40px rgba(255,107,53,0.8),0 0 60px rgba(255,107,53,0.4)'} },
+            fadeInUp: { '0%':{opacity:'0',transform:'translateY(30px)'}, '100%':{opacity:'1',transform:'translateY(0)'} }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 20% 80%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 50%, rgba(255, 107, 53, 0.05) 0%, transparent 70%);
+      z-index: -2; pointer-events: none;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .glass-card:hover {
+      transform: translateY(-8px); border-color: rgba(255, 107, 53, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 107, 53, 0.2);
+    }
+    
+    .neon-glow { position: relative; }
+    .neon-glow::after {
+      content: ''; position: absolute; inset: -2px;
+      background: linear-gradient(45deg, #FF6B35, #FF8E53, #FF6B35);
+      border-radius: inherit; z-index: -1; filter: blur(15px); opacity: 0.6;
+      animation: pulseGlow 2s ease-in-out infinite alternate;
+    }
+    .neon-text { text-shadow: 0 0 10px rgba(255, 107, 53, 0.7), 0 0 20px rgba(255, 107, 53, 0.4); }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35, #FF8E53);
+      color: white; font-weight: 600; padding: 16px 32px; border-radius: 16px;
+      display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease;
+      position: relative; overflow: hidden; border: none; cursor: pointer; font-size: 1.1rem;
+      box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6), 0 0 25px rgba(255, 107, 53, 0.3);
+    }
+    .btn-primary::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s;
+    }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-large { padding: 20px 48px; font-size: 1.25rem; border-radius: 20px; }
+    
+    .wave-divider { position: relative; height: 100px; margin: -1px 0; }
+    .wave-divider svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
+    
+    .feature-icon {
+      width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.8rem;
+      background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+      border: 1px solid rgba(255, 107, 53, 0.3); transition: all 0.3s ease;
+    }
+    .glass-card:hover .feature-icon {
+      transform: scale(1.1); background: linear-gradient(135deg, rgba(255,107,53,0.4), rgba(255,107,53,0.15));
+      box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
+    }
+    
+    .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0a0a0f; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #FF6B35, #FF8E53); border-radius: 4px; }
+    
+    @media (max-width: 768px) {
+      .btn-primary { padding: 14px 24px; font-size: 1rem; }
+      .btn-large { padding: 18px 36px; font-size: 1.1rem; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 2rem !important; }
+      .feature-icon { width: 60px; height: 60px; font-size: 1.5rem; }
+      .btn-large { padding: 16px 28px; font-size: 1rem; }
+    }
+    .logo-glow { animation: pulseGlow 3s ease-in-out infinite alternate; }
+  </style>
+</head>
+<body>
+
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-glass-border px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img alt="NDtube Logo" class="h-10 w-10 rounded-xl logo-glow" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2ffjy84yXgW794n3N5DI85xakskitIrvqcJNegnd1Gi4mOm7g2SeRjC7rVqMVLwv1htq4WNasxZOzzX08XluliWhRFYM8l0Ug08yF4RNiWwW30__X_tBB4c6ZbgiW7_SPJCsSHD4tCNu7_miASbUhb5SZo2LjBWFaeJ8kei0W47JONEx-OdGE_anqXtkL/s1600/logo.png"/>
+        <span class="font-display font-bold text-xl neon-text">NDtube</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8">
+        <a class="text-gray-300 hover:text-white transition-colors font-medium" href="#home">Home</a>
+        <a class="text-gray-300 hover:text-white transition-colors font-medium" href="#features">Features</a>
+        <a class="text-gray-300 hover:text-white transition-colors font-medium" href="#advantages">Keunggulan</a>
+        <a class="btn-primary text-sm px-6 py-2" href="#download"><i class="fas fa-download"></i> Download</a>
+      </div>
+      <button class="md:hidden text-white"><i class="fas fa-bars text-xl"></i></button>
+    </div>
+  </nav>
+
+  <section class="min-h-screen flex items-center justify-center pt-24 pb-16 px-6 relative overflow-hidden" id="home">
+    <div class="absolute inset-0 opacity-30" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+');"></div>
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
+      <div class="text-center lg:text-left space-y-8 animate-on-scroll">
+        <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">Download Video Lebih Mudah dengan <span class="text-primary neon-text">NDtube</span></h1>
+        <p class="text-lg md:text-xl text-gray-300 max-w-xl mx-auto lg:mx-0">Unduh video favoritmu, convert ke MP3, dan putar di background dengan cepat dan ringan.</p>
+      </div>
+      <div class="flex flex-col items-center justify-center animate-on-scroll space-y-8" style="animation-delay: 0.2s">
+        <div class="relative w-full max-w-md aspect-square flex items-center justify-center">
+          <div class="absolute inset-0 bg-gradient-to-tr from-primary to-orange-500 rounded-full opacity-20 blur-[100px] animate-pulse-glow"></div>
+          <img alt="NDtube App Logo" class="relative z-10 w-4/5 h-auto drop-shadow-[0_0_30px_rgba(255,107,53,0.4)] animate-float" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2ffjy84yXgW794n3N5DI85xakskitIrvqcJNegnd1Gi4mOm7g2SeRjC7rVqMVLwv1htq4WNasxZOzzX08XluliWhRFYM8l0Ug08yF4RNiWwW30__X_tBB4c6ZbgiW7_SPJCsSHD4tCNu7_miASbUhb5SZo2LjBWFaeJ8kei0W47JONEx-OdGE_anqXtkL/s1600/logo.png"/>
+        </div>
+        <button class="btn-primary btn-large neon-glow"><i class="fas fa-download text-2xl"></i> Download APK</button>
+      </div>
+    </div>
+    <div class="wave-divider">
+      <svg preserveAspectRatio="none" viewBox="0 0 1440 100"><path d="M0,32L48,42.7C96,53,192,75,288,74.7C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,64C1248,64,1344,64,1392,64L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z" fill="#0a0a0f"></path></svg>
+    </div>
+  </section>
+
+  <section class="py-24 px-6 relative" id="features">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 animate-on-scroll">
+        <span class="inline-block px-4 py-1 rounded-full glass border border-glass-border text-primary text-sm font-medium mb-4">✨ Fitur Unggulan</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold mb-4">Semua yang Anda Butuhkan dalam <span class="text-primary neon-text">Satu Aplikasi</span></h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">Nikmati pengalaman download video yang lebih cerdas, cepat, dan efisien dengan fitur-fitur premium NDTube.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass-card p-8 text-center animate-on-scroll" style="animation-delay: 0.1s">
+          <div class="feature-icon mx-auto mb-6 neon-glow"><i class="fas fa-cloud-download-alt text-primary"></i></div>
+          <h3 class="font-display font-bold text-xl mb-3">Download Semua Video</h3>
+          <p class="text-gray-400">Unduh video kualitas tinggi dengan cepat dan mudah dari berbagai platform populer.</p>
+        </div>
+        <div class="glass-card p-8 text-center animate-on-scroll" style="animation-delay: 0.2s">
+          <div class="feature-icon mx-auto mb-6 neon-glow"><i class="fas fa-music text-primary"></i></div>
+          <h3 class="font-display font-bold text-xl mb-3">Convert Video ke MP3</h3>
+          <p class="text-gray-400">Ubah video menjadi MP3 hanya dengan satu klik. Hemat penyimpanan dan nikmati musik favoritmu.</p>
+        </div>
+        <div class="glass-card p-8 text-center animate-on-scroll" style="animation-delay: 0.3s">
+          <div class="feature-icon mx-auto mb-6 neon-glow"><i class="fas fa-play-circle text-primary"></i></div>
+          <h3 class="font-display font-bold text-xl mb-3">Putar di Background</h3>
+          <p class="text-gray-400">Nikmati audio sambil membuka aplikasi lain atau layar mati. Multitasking jadi lebih mudah.</p>
+        </div>
+      </div>
+    </div>
+    <div class="wave-divider mt-24">
+      <svg preserveAspectRatio="none" viewBox="0 0 1440 100"><path d="M0,64L48,69.3C96,75,192,85,288,85.3C384,85,480,75,576,69.3C672,64,768,64,864,69.3C960,75,1056,85,1152,85.3C1248,85,1344,75,1392,69.3L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z" fill="#0a0a0f"></path></svg>
+    </div>
+  </section>
+
+  <section class="py-24 px-6 relative bg-darker" id="advantages">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(255,107,53,0.08) 0%, transparent 70%);"></div>
+    <div class="max-w-5xl mx-auto text-center animate-on-scroll">
+      <span class="inline-block px-4 py-1 rounded-full glass border border-glass-border text-primary text-sm font-medium mb-4">🚀 Kenapa Memilih NDTube?</span>
+      <h2 class="font-display text-3xl md:text-4xl font-bold mb-6">Pengalaman Premium <span class="text-primary neon-text">Tanpa Kompromi</span></h2>
+      <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Dirancang untuk memberikan performa terbaik dengan antarmuka yang intuitif dan fitur yang powerful.</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center flex-shrink-0"><i class="fas fa-bolt text-white"></i></div>
+          <div><h4 class="font-bold mb-1">Ringan dan Cepat</h4><p class="text-gray-400 text-sm">Optimasi performa maksimal untuk pengalaman yang mulus.</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center flex-shrink-0"><i class="fas fa-gift text-white"></i></div>
+          <div><h4 class="font-bold mb-1">Gratis Digunakan</h4><p class="text-gray-400 text-sm">Semua fitur premium tersedia tanpa biaya tersembunyi.</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center flex-shrink-0"><i class="fas fa-user-slash text-white"></i></div>
+          <div><h4 class="font-bold mb-1">Tanpa Login</h4><p class="text-gray-400 text-sm">Privasi Anda prioritas. Gunakan langsung tanpa registrasi.</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center flex-shrink-0"><i class="fas fa-paint-brush text-white"></i></div>
+          <div><h4 class="font-bold mb-1">UI Modern</h4><p class="text-gray-400 text-sm">Desain elegan dengan navigasi yang intuitif dan mudah digunakan.</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center flex-shrink-0"><i class="fas fa-layer-group text-white"></i></div>
+          <div><h4 class="font-bold mb-1">Multitasking Support</h4><p class="text-gray-400 text-sm">Putar audio di background sambil menggunakan aplikasi lain.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="wave-divider mt-24">
+      <svg preserveAspectRatio="none" viewBox="0 0 1440 100"><path d="M0,32L48,42.7C96,53,192,75,288,74.7C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,64C1248,64,1344,64,1392,64L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" fill="#0a0a0f"></path></svg>
+    </div>
+  </section>
+
+  <section class="py-24 px-6 relative overflow-hidden" id="download">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/10"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(255,107,53,0.2) 0%, transparent 70%);"></div>
+    <div class="max-w-4xl mx-auto text-center relative z-10 animate-on-scroll">
+      <h2 class="font-display text-4xl md:text-5xl font-bold mb-6 neon-text">Mulai Gunakan NDTube Sekarang</h2>
+      <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">Nikmati pengalaman download dan background play tanpa batas. Gratis, cepat, dan aman.</p>
+      <button class="btn-primary btn-large neon-glow mb-6"><i class="fas fa-download text-2xl"></i> Download Sekarang</button>
+      <p class="text-gray-400 text-sm"><i class="fas fa-shield-alt mr-1"></i> 100% Aman &amp; Tanpa Iklan Mengganggu</p>
+      <div class="flex flex-wrap justify-center gap-6 mt-12">
+        <div class="flex items-center gap-2 text-gray-400"><i class="fas fa-check-circle text-primary"></i><span class="text-sm">Tanpa Root</span></div>
+        <div class="flex items-center gap-2 text-gray-400"><i class="fas fa-check-circle text-primary"></i><span class="text-sm">Offline Support</span></div>
+        <div class="flex items-center gap-2 text-gray-400"><i class="fas fa-check-circle text-primary"></i><span class="text-sm">Update Rutin</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-12 px-6 border-t border-glass-border">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="md:col-span-1">
+          <div class="flex items-center gap-3 mb-4">
+            <img alt="NDtube Logo" class="h-10 w-10 rounded-xl logo-glow" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2ffjy84yXgW794n3N5DI85xakskitIrvqcJNegnd1Gi4mOm7g2SeRjC7rVqMVLwv1htq4WNasxZOzzX08XluliWhRFYM8l0Ug08yF4RNiWwW30__X_tBB4c6ZbgiW7_SPJCsSHD4tCNu7_miASbUhb5SZo2LjBWFaeJ8kei0W47JONEx-OdGE_anqXtkL/s1600/logo.png"/>
+            <span class="font-display font-bold text-xl neon-text">NDtube</span>
+          </div>
+          <p class="text-gray-400 max-w-md mb-6">Aplikasi download video premium untuk Android. Cepat, ringan, dan penuh fitur untuk kebutuhan multimedia Anda.</p>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4">Menu</h4>
+          <ul class="space-y-3">
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#home">Home</a></li>
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#features">Features</a></li>
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#advantages">Keunggulan</a></li>
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#download">Download</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4">Legal</h4>
+          <ul class="space-y-3">
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#">Privacy Policy</a></li>
+            <li><a class="text-gray-400 hover:text-white transition-colors" href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-glass-border flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-gray-500 text-sm">&#169; 2026 <span class="text-primary font-medium">NDtube</span>. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="fixed bottom-8 right-8 w-12 h-12 rounded-full glass flex items-center justify-center text-primary hover:text-white transition-all opacity-0 invisible hover:scale-110 z-50" id="scrollToTop"><i class="fas fa-arrow-up text-lg"></i></button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var animateElements = document.querySelectorAll('.animate-on-scroll');
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+      }, { threshold: 0.1 });
+      animateElements.forEach(function(el) { observer.observe(el); });
+      
+      var scrollToTopBtn = document.getElementById('scrollToTop');
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          scrollToTopBtn.classList.remove('opacity-0','invisible'); scrollToTopBtn.classList.add('opacity-100','visible');
+        } else {
+          scrollToTopBtn.classList.add('opacity-0','invisible'); scrollToTopBtn.classList.remove('opacity-100','visible');
+        }
+      });
+      scrollToTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+      
+      var mobileMenuBtn = document.querySelector('.md\\:hidden button');
+      if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', function() { alert('Menu mobile akan diimplementasikan dengan animasi slide-in'); });
+      
+      var buttons = document.querySelectorAll('.btn-primary');
+      buttons.forEach(function(btn) {
+        btn.addEventListener('mouseenter', function() { btn.style.transform = 'translateY(-3px)'; });
+        btn.addEventListener('mouseleave', function() { btn.style.transform = 'translateY(0)'; });
+      });
+    });
+  </script>
+
+</body>
+</html>
