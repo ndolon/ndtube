@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NDtube - Play YouTube Freely. Aplikasi Android untuk menonton YouTube di background dengan floating player, hemat baterai, dan pengalaman tanpa batas.">
+    <meta name="keywords" content="NDtube, YouTube, background play, floating player, Android app">
+    <meta name="author" content="NDtube">
+    <meta property="og:title" content="NDtube - Play YouTube Freely">
+    <meta property="og:description" content="Aplikasi Android untuk menonton YouTube di background dengan floating player dan hemat baterai.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png">
+    <meta property="og:url" content="https://ndtube.app">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NDtube - Play YouTube Freely">
+    <meta name="twitter:description" content="Aplikasi Android untuk menonton YouTube di background">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png">
+    <title>NDtube - Play YouTube Freely | Aplikasi Android Premium</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==================== RESET & BASE ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #181818;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff7a00;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff9f43;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background-color: #ff7a00;
+            color: #0f0f0f;
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(255, 122, 0, 0.3), 
+                            0 0 40px rgba(255, 122, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(255, 122, 0, 0.5), 
+                            0 0 60px rgba(255, 122, 0, 0.2);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes moveBackground {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-30px) translateX(10px); opacity: 0.8; }
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            color: #0f0f0f;
+            box-shadow: 0 0 30px rgba(255, 122, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(255, 122, 0, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 122, 0, 0.1);
+            color: #ff7a00;
+            border: 2px solid #ff7a00;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 122, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 122, 0, 0.2);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* ==================== HEADER & NAVIGATION ==================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 122, 0, 0.1);
+            padding: 15px 0;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .logo img {
+            height: 40px;
+            width: 40px;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff7a00;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ff7a00;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #ff7a00;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+            padding: 60px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 30%, rgba(255, 122, 0, 0.15), transparent),
+                radial-gradient(ellipse 600px 500px at 80% 70%, rgba(255, 122, 0, 0.1), transparent);
+            pointer-events: none;
+            animation: moveBackground 20s ease-in-out infinite;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            animation: slideInUp 0.8s ease 0.2s backwards;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            margin-bottom: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero-logo img {
+            height: 120px;
+            width: 120px;
+            border-radius: 24px;
+            box-shadow: 0 0 60px rgba(255, 122, 0, 0.4);
+            filter: drop-shadow(0 0 30px rgba(255, 122, 0, 0.3));
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 50px;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-buttons .btn {
+            padding: 16px 40px;
+            font-size: 1.1rem;
+        }
+
+        /* ==================== FEATURES SECTION ==================== */
+        .features {
+            padding: 120px 20px;
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff7a00, transparent);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: rgba(255, 122, 0, 0.05);
+            border: 1px solid rgba(255, 122, 0, 0.2);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 122, 0, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 122, 0, 0.1);
+            border-color: rgba(255, 122, 0, 0.4);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(255, 122, 0, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+        }
+
+        /* ==================== ABOUT SECTION ==================== */
+        .about {
+            padding: 120px 20px;
+            position: relative;
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff7a00, transparent);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1000px;
+            margin: 60px auto 0;
+        }
+
+        .about-text h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .about-text p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .about-features-list {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .about-feature-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .about-feature-item i {
+            color: #ff7a00;
+            font-size: 1.3rem;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .about-feature-item span {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .about-visual {
+            background: linear-gradient(135deg, rgba(255, 122, 0, 0.1) 0%, rgba(255, 159, 67, 0.05) 100%);
+            border: 2px solid rgba(255, 122, 0, 0.2);
+            border-radius: 20px;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 122, 0, 0.2), transparent);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .about-visual-icon {
+            font-size: 5rem;
+            color: #ff7a00;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 30px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .about-visual-text {
+            position: relative;
+            z-index: 2;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        /* ==================== FAQ SECTION ==================== */
+        .faq {
+            padding: 120px 20px;
+            position: relative;
+        }
+
+        .faq::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff7a00, transparent);
+        }
+
+        .faq-container {
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 60px;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 122, 0, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 122, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(255, 122, 0, 0.4);
+            background: rgba(255, 122, 0, 0.05);
+        }
+
+        .faq-question {
+            padding: 20px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.05rem;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: #ff7a00;
+        }
+
+        .faq-icon {
+            color: #ff7a00;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 30px 20px 30px;
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: rgba(24, 24, 24, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 122, 0, 0.1);
+            padding: 40px 20px 20px;
+            margin-top: 120px;
+            position: relative;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: 40px;
+            border-radius: 8px;
+        }
+
+        .footer-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff7a00 0%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 122, 0, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* ==================== PARTICLES ==================== */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff7a00;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: particleFloat 4s ease-in-out infinite;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .section-subtitle {
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+            }
+
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+
+            .hero-logo img {
+                height: 80px;
+                width: 80px;
+            }
+        }
+
+        /* ==================== SCROLL REVEAL ==================== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .scroll-reveal.active {
+            animation: slideInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div class="particles" id="particlesContainer"></div>
+
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png" alt="NDtube Logo">
+                    <span class="logo-text">NDtube</span>
+                </div>
+                <nav>
+                    <a href="#features">Fitur</a>
+                    <a href="#about">Tentang</a>
+                    <a href="#faq">FAQ</a>
+                </nav>
+                <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-logo">
+                    <img src="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png" alt="NDtube">
+                </div>
+                <h1 class="hero-title">
+                    Tonton <span>YouTube Dengan Bebas</span>
+                </h1>
+                <p class="hero-subtitle">NDtube - Play YouTube Freely</p>
+                <p class="hero-description">
+                    Aplikasi Android premium untuk menonton YouTube di background dengan floating player yang elegan, 
+                    hemat baterai, performa super cepat, dan pengalaman multitasking tanpa batas. 
+                    Nikmati YouTube seperti tidak pernah ada sebelumnya.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="downloadAPK()">
+                        <i class="fas fa-download btn-icon"></i>
+                        Download APK Gratis
+                    </button>
+                    <button class="btn btn-secondary" onclick="scrollToFeatures()">
+                        <i class="fas fa-arrow-down btn-icon"></i>
+                        Pelajari Lebih Lanjut
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Fitur Unggulan</h2>
+            <p class="section-subtitle">Pengalaman menonton YouTube yang revolusioner dengan teknologi terdepan</p>
+            
+            <div class="features-grid">
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="feature-title">Background Play</h3>
+                    <p class="feature-description">Putar video YouTube di background sambil menggunakan aplikasi lain dengan lancar dan tanpa gangguan</p>
+                </div>
+
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-window-restore"></i>
+                    </div>
+                    <h3 class="feature-title">Floating Window</h3>
+                    <p class="feature-description">Tonton video dalam jendela mengambang yang dapat dipindahkan ke mana saja di layar Anda</p>
+                </div>
+
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="feature-title">Performa Cepat</h3>
+                    <p class="feature-description">Aplikasi yang super cepat dan responsif untuk pengalaman menonton YouTube terbaik</p>
+                </div>
+
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-battery-full"></i>
+                    </div>
+                    <h3 class="feature-title">Hemat Baterai</h3>
+                    <p class="feature-description">Teknologi optimisasi hemat baterai hingga 60% lebih efisien dari aplikasi kompetitor</p>
+                </div>
+
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h3 class="feature-title">HD Streaming</h3>
+                    <p class="feature-description">Streaming video berkualitas HD dengan koneksi internet yang stabil dan smooth</p>
+                </div>
+
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Interface</h3>
+                    <p class="feature-description">Antarmuka cerdas dan intuitif yang mudah digunakan untuk semua kalangan pengguna</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">Tentang NDtube</h2>
+            <p class="section-subtitle">Revolusi cara Anda menonton YouTube dengan teknologi terkini</p>
+
+            <div class="about-content scroll-reveal">
+                <div class="about-text">
+                    <h3>Mengapa Memilih NDtube?</h3>
+                    <p>
+                        NDtube adalah aplikasi Android terbaik untuk pengalaman menonton YouTube yang bebas dan unlimited. 
+                        Dirancang dengan teknologi terkini dan fokus pada kemudahan pengguna, NDtube memberikan solusi 
+                        sempurna untuk menonton video favorit Anda kapan saja, di mana saja.
+                    </p>
+                    
+                    <div class="about-features-list">
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Interface modern dan user-friendly yang mudah dipelajari</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Hemat baterai hingga 60% lebih efisien dari kompetitor</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Floating player dengan kontrol penuh dan customizable</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Aplikasi legal, aman, dan tersertifikasi</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Support untuk semua perangkat Android modern</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Update rutin dengan fitur dan peningkatan performa</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 30px;" onclick="downloadAPK()">
+                        <i class="fas fa-download btn-icon"></i>
+                        Unduh Sekarang
+                    </button>
+                </div>
+
+                <div class="about-visual">
+                    <div class="about-visual-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="about-visual-text">
+                        <p style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">Premium Quality</p>
+                        <p>Pengalaman menonton YouTube level profesional dengan teknologi terdepan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Pertanyaan Umum</h2>
+            <p class="section-subtitle">Jawaban untuk pertanyaan yang sering diajukan tentang NDtube</p>
+
+            <div class="faq-container">
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Apakah NDtube aman digunakan?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Ya, NDtube adalah aplikasi yang aman dan legal. Aplikasi ini dirancang untuk memberikan pengalaman 
+                        menonton YouTube yang lebih baik tanpa mengorbankan keamanan perangkat Anda. Semua data Anda dilindungi 
+                        dengan enkripsi tingkat tinggi dan kami tidak mengumpulkan informasi pribadi yang tidak perlu.
+                    </div>
+                </div>
+
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Berapa ukuran file aplikasi NDtube?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Aplikasi NDtube memiliki ukuran file sebesar 45.2 MB, yang sangat ringan dan tidak akan membebani 
+                        penyimpanan perangkat Anda. Aplikasi ini dioptimalkan untuk performa maksimal dengan ukuran minimal, 
+                        sehingga cocok untuk perangkat dengan storage terbatas.
+                    </div>
+                </div>
+
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Apa saja fitur unggulan NDtube?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        NDtube memiliki enam fitur unggulan utama: Background Play (putar di background), 
+                        Floating Window (jendela mengambang), Performa Cepat, Hemat Baterai (60% lebih efisien), 
+                        HD Streaming (kualitas tinggi), dan Smart Interface (antarmuka intuitif). Semua dirancang 
+                        untuk memberikan pengalaman menonton terbaik.
+                    </div>
+                </div>
+
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Berapa versi Android minimum yang diperlukan?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        NDtube memerlukan Android 7.0 atau lebih baru. Aplikasi ini kompatibel dengan hampir semua 
+                        perangkat Android modern yang beredar saat ini. Jika perangkat Anda menjalankan Android 7.0 atau 
+                        lebih tinggi, Anda dapat mengunduh dan menggunakan NDtube tanpa masalah atau hambatan apapun.
+                    </div>
+                </div>
+
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Apakah ada biaya untuk menggunakan NDtube?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Tidak, NDtube sepenuhnya gratis untuk diunduh dan digunakan. Kami percaya bahwa semua orang 
+                        berhak mendapatkan akses ke pengalaman menonton YouTube terbaik tanpa harus membayar. 
+                        Tidak ada biaya tersembunyi, tidak ada model freemium, dan tidak ada iklan yang mengganggu.
+                    </div>
+                </div>
+
+                <div class="faq-item scroll-reveal">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Bagaimana cara mengunduh NDtube?</span>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Cukup klik tombol "Download APK Gratis" di bagian atas atau hero section. File APK akan mulai diunduh 
+                        ke perangkat Anda secara otomatis. Setelah selesai, buka file dan ikuti proses instalasi standar. 
+                        Dalam hitungan detik, Anda sudah bisa mulai menggunakan NDtube dan menikmati pengalaman menonton YouTube.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://raw.githubusercontent.com/ndolon/ndtube/main/logo.png" alt="NDtube" style="height: 40px; width: 40px;">
+                <span class="footer-logo-text">NDtube</span>
+            </div>
+            <p class="footer-description">
+                Platform menonton YouTube modern dengan floating player dan background play yang revolusioner. 
+                Hemat baterai, cepat, dan legal.
+            </p>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 NDtube - Play YouTube Freely. Semua hak dilindungi. | Dibuat dengan <span style="color: #ff7a00;">❤</span> oleh tim NDtube</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== PARTICLES ANIMATION ====================
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                const duration = 4 + Math.random() * 3;
+                const delay = Math.random() * 5;
+
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.animationDuration = duration + 's';
+                particle.style.animationDelay = delay + 's';
+
+                container.appendChild(particle);
+            }
+        }
+
+        // ==================== SCROLL REVEAL ====================
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.scroll-reveal');
+            
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        // ==================== FAQ TOGGLE ====================
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Toggle current FAQ
+            faqItem.classList.toggle('active');
+        }
+
+        // ==================== SMOOTH SCROLL ====================
+        function scrollToSection(selector) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function scrollToFeatures() {
+            scrollToSection('#features');
+        }
+
+        // ==================== DOWNLOAD APK ====================
+        function downloadAPK() {
+            // Ganti dengan link download APK yang sebenarnya
+            const downloadLink = 'https://github.com/ndolon/ndtube/releases/download/latest/NDtube.apk';
+            window.location.href = downloadLink;
+        }
+
+        // ==================== SMOOTH SCROLL LINKS ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = this.getAttribute('href');
+                if (target !== '#') {
+                    scrollToSection(target);
+                }
+            });
+        });
+
+        // ==================== NAVBAR BACKGROUND ON SCROLL ====================
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(15, 15, 15, 0.95)';
+                header.style.borderBottomColor = 'rgba(255, 122, 0, 0.2)';
+            } else {
+                header.style.background = 'rgba(15, 15, 15, 0.7)';
+                header.style.borderBottomColor = 'rgba(255, 122, 0, 0.1)';
+            }
+        });
+
+        // ==================== INITIALIZE ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            revealOnScroll();
+        });
+
+        // ==================== CONTINUOUS SCROLL REVEAL ====================
+        window.addEventListener('scroll', revealOnScroll);
+
+        // ==================== MOBILE MENU ====================
+        const menuToggle = document.querySelector('.menu-toggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                const nav = document.querySelector('nav');
+                if (nav) {
+                    nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+                    nav.style.position = 'absolute';
+                    nav.style.top = '100%';
+                    nav.style.left = '0';
+                    nav.style.right = '0';
+                    nav.style.flexDirection = 'column';
+                    nav.style.padding = '20px';
+                    nav.style.background = 'rgba(24, 24, 24, 0.95)';
+                    nav.style.backdropFilter = 'blur(10px)';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
